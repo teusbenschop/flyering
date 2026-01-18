@@ -33,7 +33,7 @@ struct MainView: View {
     @EnvironmentObject private var trackDatabase: TrackDatabase
     @Environment(\.scenePhase) var scenePhase
 
-    @State var timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
+    @State var timer = Timer.publish(every: 5, tolerance: 0.5, on: .main, in: .common).autoconnect()
     @State private var lastLocation : CLLocation = CLLocation()
     @State private var counter : Int = 0
 
@@ -77,7 +77,7 @@ struct MainView: View {
             // A mechanism that detects if the map has not moved in a while.
             // If that is the case, and the map tracks the user location,
             // then this mechanism will reset the user tracking mode.
-            let interactionLimit = 10
+            let interactionLimit = 3
             if status.userMapInteractionCountDown < interactionLimit {
                 status.userMapInteractionCountDown += 1
                 if status.userMapInteractionCountDown == interactionLimit {
@@ -127,13 +127,13 @@ struct MainView: View {
     }
 
     func recordTrack() {
-        // Iterate over the locations. // Todo
+        // Iterate over the locations.
         while !locationManager.locations.isEmpty {
             // Safely get and remove one location from the array.
             let location = safelyGetOneLocation()
             // Get the distance from the previous location, whether it's large enough to draw it.
             let distanceMeters = location.distance(from: lastLocation)
-            if (distanceMeters < 2) {
+            if (distanceMeters < 5) {
                 continue
             }
             lastLocation = location
