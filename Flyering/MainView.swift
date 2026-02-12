@@ -131,30 +131,27 @@ struct MainView: View {
         while !locationManager.locations.isEmpty {
             // Safely get and remove one location from the array.
             let location = safelyGetOneLocation()
-            // Get the distance from the previous location, whether it's large enough to draw it.
+            // Get the time elapsed since the last recorded location,
+            // whether it's large enough to record it.
+            let intervalSeconds = location.timestamp.timeIntervalSince(lastLocation.timestamp)
+            if (intervalSeconds < 5) {
+                continue;
+            }
+            // Get the distance from the previous location,
+            // whether it's large enough to draw it.
             let distanceMeters = location.distance(from: lastLocation)
-            if (distanceMeters < 5) {
+            if (distanceMeters < 4.9) {
                 continue
             }
+            // Store this location as a reference for next time.
             lastLocation = location
             // Store the new coordinate in the database.
-            // Store it in the State object (which will prompt the mapview to draw it on the map).
+            // Store it in the State object.
+            // This will prompt the mapview to draw it on the map.
             let coordinate = location.coordinate
             trackDatabase.storeCoordinate(coordinate: coordinate)
             status.pendingTrack.append(coordinate)
         }
-//        for location in locationManager.locations {
-//            // Get the distance from the previous location, whether it's large enough to draw it.
-//            let distanceMeters = location.distance(from: lastLocation)
-//            if (distanceMeters < 2) { return }
-//            lastLocation = location
-//            // Store the new coordinate in the database.
-//            // Store it in the State object (which will prompt the mapview to draw it on the map).
-//            let coordinate = location.coordinate
-//            trackDatabase.storeCoordinate(coordinate: coordinate)
-//            status.pendingTrack.append(coordinate)
-//        }
-//        locationManager.locations = [] // Todo too late now, Use mutex here and above.
     }
 
     
