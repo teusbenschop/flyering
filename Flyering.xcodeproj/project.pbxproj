@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		CA80E9502E998B02002C4D7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = flyering/Info.plist; sourceTree = "<group>"; };
+		CA80E9502E998B02002C4D7D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = Flyering/Info.plist; sourceTree = "<group>"; };
 		CA9C5A872E8D91EB002D0C4D /* flyering.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = flyering.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -271,7 +271,7 @@
 				DEVELOPMENT_TEAM = L37WFUB5MH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = flyering/Info.plist;
+				INFOPLIST_FILE = Flyering/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Flyering;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This is needed to keep recording your track while the Tracker is in the background. Note that it access the position only while \"Tracking\" is on.";
@@ -309,7 +309,7 @@
 				DEVELOPMENT_TEAM = L37WFUB5MH;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = flyering/Info.plist;
+				INFOPLIST_FILE = Flyering/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Flyering;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This is needed to keep recording your track while the Tracker is in the background. Note that it access the position only while \"Tracking\" is on.";

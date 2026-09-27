@@ -118,7 +118,7 @@ struct MainView: View {
                 guard let url = urls.first else {return}
                 print(url)
                 let areaDatabase = AreaDatabase()
-                areaDatabase.importAreas(url: url)
+                _ = areaDatabase.importAreas(url: url)
             case .failure(let error):
                 print("failed with error:", error.localizedDescription)
             }

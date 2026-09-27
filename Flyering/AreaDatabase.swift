@@ -284,7 +284,7 @@ final class AreaDatabase {
                 
                 // Process the import by adding all records into the database.
                 for coordinates in list {
-                    storeCoordinates(coordinates: coordinates)
+                    _ = storeCoordinates(coordinates: coordinates)
                 }
 
                 // Remove any duplicates that could be in the database due to multiple imports.
