@@ -138,11 +138,11 @@ final class MarkAreaReady: ObservableObject {
         
         // Store the coordinates in the database.
         let areaDatabase = AreaDatabase()
-        let success = areaDatabase.storeCoordinates(coordinates: coordinates)
-        
+        let rowid = areaDatabase.storeCoordinates(coordinates: coordinates)
+
         // On failure to store the coordinates, bail out early.
         // It means that the map retains the area as if still working on marking it.
-        if !success {
+        if rowid != nil {
             //status.log(item: "Failure to store the marked area")
             return
         }
@@ -154,12 +154,13 @@ final class MarkAreaReady: ObservableObject {
         clear(mapView: mapView)
         
         // Call function with data from the database to draw this polygon.
-        drawPolygon(mapView: mapView, coordinates: coordinates)
+        drawPolygon(mapView: mapView, id: rowid!, coordinates: coordinates) // Todo write ID.
     }
 
     
-    // Function to draw the polygon on the map, based on the coordinates.
-    func drawPolygon (mapView: MKMapView, coordinates: [CLLocationCoordinate2D]) {
+    // Function to draw the polygon on the map.
+    // The polygon stores the rowid (Todo) and is based on the coordinates.
+    func drawPolygon (mapView: MKMapView, id: Int64, coordinates: [CLLocationCoordinate2D]) {
         let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
         mapView.addOverlay(polygon)
     }
@@ -167,10 +168,10 @@ final class MarkAreaReady: ObservableObject {
     
     func showReady (mapView: MKMapView) {
         let areaDatabase = AreaDatabase()
-        let list = areaDatabase.getAll()
+        let list = areaDatabase.getAllv2()
         print (list.count)
-        for coordinates in list {
-            drawPolygon(mapView: mapView, coordinates: coordinates)
+        for entry in list {
+            drawPolygon(mapView: mapView, id: entry.id, coordinates: entry.coordinates)
         }
     }
     

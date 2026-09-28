@@ -177,19 +177,7 @@ final class AreaDatabase {
     }
 
 
-    func getAll() -> [[CLLocationCoordinate2D]]
-    {
-        var list : [[CLLocationCoordinate2D]] = []
-        if databaseExists() {
-            openDatabase();
-            list = getAll(dbptr: db)
-            closeDatabase()
-        }
-        return list
-    }
-
-
-    private func getAll(dbptr: OpaquePointer?)  -> [[CLLocationCoordinate2D]]
+    private func getAll(dbptr: OpaquePointer?)  -> [[CLLocationCoordinate2D]] // Todo goes out.
     {
         var list : [[CLLocationCoordinate2D]] = []
         // Specify which columns to select to be sure the correct columsn are selected.
@@ -245,6 +233,55 @@ final class AreaDatabase {
                 coordinates.append(coordinate6)
                 coordinates.append(coordinate7)
                 list.append(coordinates)
+            }
+            sqlite3_finalize(statement)
+        }
+        return list
+    }
+
+
+    func getAllv2() -> [(id: Int64, coordinates: [CLLocationCoordinate2D])]
+    {
+        var list : [(id: Int64, coordinates: [CLLocationCoordinate2D])] = []
+        if databaseExists() {
+            openDatabase();
+            list = getAllv2(dbptr: db)
+            closeDatabase()
+        }
+        return list
+    }
+
+
+    private func getAllv2(dbptr: OpaquePointer?)  -> [(id: Int64, coordinates: [CLLocationCoordinate2D])]
+    {
+        var list : [(id: Int64, coordinates: [CLLocationCoordinate2D])] = []
+        // Specify which columns to select to be sure the correct columns are selected.
+        // One database may not have an identifier as a primary key, and another one may.
+        // The columns specification makes reading from both types reliable.
+        let sql =
+        """
+        SELECT rowid,
+        latitude0, longitude0,
+        latitude1, longitude1,
+        latitude2, longitude2,
+        latitude3, longitude3,
+        latitude4, longitude4,
+        latitude5, longitude5,
+        latitude6, longitude6,
+        latitude7, longitude7
+        FROM areas;
+        """
+        var statement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(dbptr, sql, -1, &statement, nil) == SQLITE_OK {
+            while sqlite3_step(statement) == SQLITE_ROW {
+                let id = sqlite3_column_int64 (statement, 0)
+                var coordinates : [CLLocationCoordinate2D] = []
+                for i in 0..<8 {
+                    let latitude  = sqlite3_column_double(statement, Int32(1 + i * 2))
+                    let longitude = sqlite3_column_double(statement, Int32(2 + i * 2))
+                    coordinates.append(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                }
+                list.append((id: id, coordinates: coordinates))
             }
             sqlite3_finalize(statement)
         }
