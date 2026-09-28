@@ -1,16 +1,16 @@
 /*
  Copyright (©) 2025-2026 Teus Benschop.
- 
+
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -18,7 +18,7 @@
 
 
 // Core Data is a layer on top of SQLite that provides a more convenient API.
-// The code below uses SQLite3 straight for better performance.
+// The code below does not use Core Data. It uses SQLite3 straight for better performance.
 
 
 import Foundation
@@ -41,17 +41,17 @@ func areaDatabaseName() -> String
 
 
 final class AreaDatabase {
-    
+
     private var db: OpaquePointer?
-    
-    
+
+
     private func databaseUrl() -> URL?
     {
         let url = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent(areaDatabaseName())
         return url
     }
 
-    
+
     private func databaseExists() -> Bool
     {
         let url : URL? = databaseUrl()
@@ -61,7 +61,7 @@ final class AreaDatabase {
         return FileManager.default.fileExists(atPath: databaseUrl()!.path)
     }
 
-    
+
     func databaseData() -> Data
     {
         if databaseExists() {
@@ -75,7 +75,7 @@ final class AreaDatabase {
         return Data()
     }
 
-    
+
     private func openDatabase()
     {
         // If the database is open already, bail out.
@@ -105,7 +105,7 @@ final class AreaDatabase {
             db = nil
             return
         }
-        
+
         // Create the table.
         let createTableString = """
             CREATE TABLE IF NOT EXISTS areas (
@@ -129,15 +129,16 @@ final class AreaDatabase {
         }
         sqlite3_finalize(createTableStatement)
     }
-    
-    
-    func storeCoordinates(coordinates: [CLLocationCoordinate2D]) -> Bool
+
+
+    // Store the coordinates and return the rowid on success.
+    func storeCoordinates(coordinates: [CLLocationCoordinate2D]) -> Int64?
     {
         // The database accepts eight coordinates, check input data for that.
         if coordinates.count != 8 {
-            return false
+            return nil
         }
-        
+
         openDatabase()
 
         let insertStatementString =
@@ -156,6 +157,7 @@ final class AreaDatabase {
         """
         var insertStatement: OpaquePointer? = nil
         var insertOffset : Int32 = 0
+        var newRowId : Int64? = nil
         if sqlite3_prepare_v2(db, insertStatementString, -1, &insertStatement, nil) == SQLITE_OK {
             for coordinate in coordinates {
                 insertOffset += 1
@@ -164,16 +166,17 @@ final class AreaDatabase {
                 sqlite3_bind_double(insertStatement, insertOffset, coordinate.longitude)
             }
             if sqlite3_step(insertStatement) == SQLITE_DONE {
-                sqlite3_finalize(insertStatement)
+                newRowId = sqlite3_last_insert_rowid(db)
             }
+            sqlite3_finalize(insertStatement)
         }
-        
+
         closeDatabase()
-        
-        return true
+
+        return newRowId
     }
-    
-    
+
+
     func getAll() -> [[CLLocationCoordinate2D]]
     {
         var list : [[CLLocationCoordinate2D]] = []
@@ -184,8 +187,8 @@ final class AreaDatabase {
         }
         return list
     }
-    
-    
+
+
     private func getAll(dbptr: OpaquePointer?)  -> [[CLLocationCoordinate2D]]
     {
         var list : [[CLLocationCoordinate2D]] = []
@@ -248,14 +251,14 @@ final class AreaDatabase {
         return list
     }
 
-    
+
     func importAreas(url: URL) -> Bool {
 
         // Request access to the file in the Files app.
         if url.startAccessingSecurityScopedResource() {
 
             do {
-                
+
                 // Get the binary content of the URL to import.
                 let content: Data = try Data(contentsOf: url)
                 url.stopAccessingSecurityScopedResource()
@@ -263,25 +266,25 @@ final class AreaDatabase {
                 // The URL of the temporary database to import.
                 let url: URL = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false).appendingPathComponent("import.sqlite")
                 print(url)
-                
+
                 // Save the binary content to the temporary database file.
                 try content.write(to: url, options: [.atomic, .completeFileProtection])
-                
+
                 // Open the temporary file as database, with error handling.
                 var dbptr: OpaquePointer? = nil
                 if sqlite3_open(url.path, &dbptr) != SQLITE_OK {
                     print("Cannot open database")
                     return false
                 }
-                
+
                 // Get all coordinates from the temporary database.
                 let list = getAll(dbptr: dbptr)
-                
+
                 // Close the temporary database.
                 if sqlite3_close(dbptr) != SQLITE_OK {
                     print("Cannot close database")
                 }
-                
+
                 // Process the import by adding all records into the database.
                 for coordinates in list {
                     _ = storeCoordinates(coordinates: coordinates)
@@ -289,22 +292,22 @@ final class AreaDatabase {
 
                 // Remove any duplicates that could be in the database due to multiple imports.
                 removeDuplicates()
-                
+
             } catch {
                 print(error.localizedDescription)
                 return false
             }
         }
-        
+
         // Import success.
         return true
     }
 
-    
+
     func removeDuplicates()
     {
         openDatabase()
-        
+
         let sql =
         """
         DELETE FROM areas WHERE rowid NOT IN
@@ -326,11 +329,11 @@ final class AreaDatabase {
                 sqlite3_finalize(statement)
             }
         }
-        
+
         closeDatabase()
     }
 
-    
+
     private func closeDatabase()
     {
         if db == nil {
@@ -341,5 +344,5 @@ final class AreaDatabase {
         }
         db = nil
     }
-    
+
 }
