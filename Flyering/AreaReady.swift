@@ -168,7 +168,7 @@ final class MarkAreaReady: ObservableObject {
     
     func showReady (mapView: MKMapView) {
         let areaDatabase = AreaDatabase()
-        let list = areaDatabase.getAllv2()
+        let list = areaDatabase.getAll()
         print (list.count)
         for entry in list {
             drawPolygon(mapView: mapView, id: entry.id, coordinates: entry.coordinates)
