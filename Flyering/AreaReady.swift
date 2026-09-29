@@ -142,7 +142,7 @@ final class MarkAreaReady: ObservableObject {
 
         // On failure to store the coordinates, bail out early.
         // It means that the map retains the area as if still working on marking it.
-        if rowid != nil {
+        if rowid == nil {
             //status.log(item: "Failure to store the marked area")
             return
         }
