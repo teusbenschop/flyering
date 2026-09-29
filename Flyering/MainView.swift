@@ -103,9 +103,9 @@ struct MainView: View {
         ) { result in
             switch result {
             case .success(let url):
-                print("Saved to", url)
+                status.log(item: "Areas exported to " + url.path())
             case .failure(let error):
-                print(error.localizedDescription)
+                status.log(item: error.localizedDescription)
             }
         }
         .fileImporter(
@@ -116,11 +116,11 @@ struct MainView: View {
             switch result {
             case .success(let urls):
                 guard let url = urls.first else {return}
-                print(url)
+                status.log(item: "Import areas from " + url.path())
                 let areaDatabase = AreaDatabase()
                 _ = areaDatabase.importAreas(url: url)
             case .failure(let error):
-                print("failed with error:", error.localizedDescription)
+                status.log(item: "Import failed with error " + error.localizedDescription)
             }
         }
 
