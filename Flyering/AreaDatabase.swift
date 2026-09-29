@@ -323,6 +323,23 @@ final class AreaDatabase {
     }
 
 
+    func getAreaCount() -> Int64 // Todo use this
+    {
+        var count : Int64 = 0
+        openDatabase()
+        let sql = "SELECT COUNT(*) FROM areas;"
+        var statement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK {
+            if sqlite3_step(statement) == SQLITE_ROW {
+                count = sqlite3_column_int64(statement, 0)
+            }
+        }
+        sqlite3_finalize(statement)
+        closeDatabase()
+        return count
+    }
+
+    
     private func closeDatabase()
     {
         if db == nil {
