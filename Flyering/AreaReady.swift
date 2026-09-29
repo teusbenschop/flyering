@@ -231,8 +231,8 @@ func getImageScale(view: DraggableAnnotationView, dragging: Bool) -> CGFloat
 }
 
 
-class DraggableAnnotation: NSObject, MKAnnotation {
-    
+final class DraggableAnnotation: NSObject, MKAnnotation {
+
     var coordinate: CLLocationCoordinate2D
     var index: Int
     
@@ -244,7 +244,7 @@ class DraggableAnnotation: NSObject, MKAnnotation {
 }
 
 
-class DraggableAnnotationView: MKAnnotationView {
+final class DraggableAnnotationView: MKAnnotationView {
     override var annotation: MKAnnotation? {
         didSet {
             self.isDraggable = true
@@ -273,3 +273,10 @@ class ReadyPolygon: MKPolygon {
 }
 
 
+// A polygon representing an area already stored in the database.
+// The polygon subclass carries its database row id and source coordinates.
+// This serves to give the map overlay an identity.
+final class StoredAreaPolygon: MKPolygon { // Todo use this.
+     var rowid: Int64 = 0
+     var storedCoordinates: [CLLocationCoordinate2D] = []
+}
