@@ -309,6 +309,20 @@ final class AreaDatabase {
     }
 
 
+    func removeArea(id: Int64) // Todo use this eventually.
+    {
+        openDatabase()
+        let sql = "DELETE FROM areas WHERE rowid = ?;"
+        var statement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK {
+            sqlite3_bind_int64(statement, 1, id)
+            sqlite3_step(statement)
+            sqlite3_finalize(statement)
+        }
+        closeDatabase()
+    }
+
+
     private func closeDatabase()
     {
         if db == nil {
