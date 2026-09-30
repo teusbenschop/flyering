@@ -134,7 +134,22 @@ struct MapViewUi: UIViewRepresentable {
                 previousShowAreasReady = status.showAreasReady
             }
         }
-        
+
+        // Check on whether to erase the last area marked ready.
+        if status.removeLastArea {
+            print ("Remove last area")
+            let areaDatabase = AreaDatabase()
+            let rowid : Int64? = areaDatabase.getHighestRowId()
+            if rowid != nil {
+                areaDatabase.removeArea(id: rowid!)
+            }
+            let count = areaDatabase.getAreaCount()
+            DispatchQueue.main.async() {
+                status.removeLastArea = false
+                status.log(item: "Remove last area marked ready, remain with " + count.description + " areas")
+            }
+        }
+
     }
     
     func makeCoordinator() -> Coordinator {

@@ -50,6 +50,7 @@ final class Status: ObservableObject {
     // Marking an area as ready.
     @Published var markReadyStart : Bool = false
     @Published var showAreasReady : Bool = false
+    @Published var removeLastArea : Bool = false
 }
 
 

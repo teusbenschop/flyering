@@ -339,7 +339,27 @@ final class AreaDatabase {
         return count
     }
 
-    
+
+    func getHighestRowId() -> Int64? // Todo use this.
+    {
+        var rowId : Int64? = nil
+        openDatabase()
+        let sql = "SELECT MAX(rowid) FROM areas;"
+        var statement: OpaquePointer? = nil
+        if sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK {
+            if sqlite3_step(statement) == SQLITE_ROW {
+                // MAX() yields NULL when the table has no rows.
+                if sqlite3_column_type(statement, 0) != SQLITE_NULL {
+                    rowId = sqlite3_column_int64(statement, 0)
+                }
+            }
+        }
+        sqlite3_finalize(statement)
+        closeDatabase()
+        return rowId
+    }
+
+
     private func closeDatabase()
     {
         if db == nil {

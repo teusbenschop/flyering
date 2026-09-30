@@ -39,6 +39,8 @@ struct MaintenanceView: View {
                 .padding(.horizontal)
             ButtonOpenJournal()
                 .padding(.horizontal)
+            ButtonRemoveLastAreaMarkedReady()
+                .padding(.horizontal)
             Spacer()
         }
             .onAppear() {

@@ -257,3 +257,17 @@ struct ButtonOpenJournal: View {
 }
 
 
+struct ButtonRemoveLastAreaMarkedReady: View {
+     @EnvironmentObject var status: Status
+     var body: some View {
+          Button(action: {
+               status.removeLastArea = true
+               status.displayMaintenance = false
+          })
+          {
+               Text("Remove last area marked ready")
+                    .font(.system(size: 12, weight: .thin))
+          }
+          .buttonStyle(.bordered)
+     }
+}
