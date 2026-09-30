@@ -159,9 +159,11 @@ final class MarkAreaReady: ObservableObject {
 
     
     // Function to draw the polygon on the map.
-    // The polygon stores the rowid (Todo) and is based on the coordinates.
+    // The polygon stores the rowid and is based on the coordinates.
     func drawPolygon (mapView: MKMapView, id: Int64, coordinates: [CLLocationCoordinate2D]) {
-        let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+        let polygon = StoredAreaPolygon(coordinates: coordinates, count: coordinates.count)
+        polygon.rowid = id
+        polygon.storedCoordinates = coordinates
         mapView.addOverlay(polygon)
     }
     
@@ -169,7 +171,6 @@ final class MarkAreaReady: ObservableObject {
     func showReady (mapView: MKMapView) {
         let areaDatabase = AreaDatabase()
         let list = areaDatabase.getAll()
-        print (list.count)
         for entry in list {
             drawPolygon(mapView: mapView, id: entry.id, coordinates: entry.coordinates)
         }
@@ -177,10 +178,8 @@ final class MarkAreaReady: ObservableObject {
     
     
     func hideReady (mapView: MKMapView) {
-        for polygon in mapView.overlays {
-            guard polygon is MKPolygon else { continue }
-            mapView.removeOverlay(polygon)
-        }
+        let polygons = mapView.overlays.filter { $0 is StoredAreaPolygon }
+        mapView.removeOverlays(polygons)
     }
 
 
