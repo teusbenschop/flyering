@@ -309,7 +309,7 @@ final class AreaDatabase {
     }
 
 
-    func removeArea(id: Int64) // Todo use this eventually.
+    func removeArea(id: Int64)
     {
         openDatabase()
         let sql = "DELETE FROM areas WHERE rowid = ?;"
@@ -323,7 +323,7 @@ final class AreaDatabase {
     }
 
 
-    func getAreaCount() -> Int64 // Todo use this
+    func getAreaCount() -> Int64
     {
         var count : Int64 = 0
         openDatabase()
@@ -340,7 +340,7 @@ final class AreaDatabase {
     }
 
 
-    func getHighestRowId() -> Int64? // Todo use this.
+    func getHighestRowId() -> Int64?
     {
         var rowId : Int64? = nil
         openDatabase()

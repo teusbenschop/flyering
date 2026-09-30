@@ -329,7 +329,7 @@ class ReadyPolygon: MKPolygon {
 // A polygon representing an area already stored in the database.
 // The polygon subclass carries its database row id and source coordinates.
 // This serves to give the map overlay an identity.
-final class StoredAreaPolygon: MKPolygon { // Todo use this.
+final class StoredAreaPolygon: MKPolygon {
      var rowid: Int64 = 0
      var storedCoordinates: [CLLocationCoordinate2D] = []
 }
