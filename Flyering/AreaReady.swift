@@ -183,6 +183,51 @@ final class MarkAreaReady: ObservableObject {
     }
 
 
+
+    // A point-in-polygon test.
+    // It uses the ray casting algorithm (also called the even-odd rule).
+    // Returns true if this coordinate is inside the polygon. Else false.
+    // Methodology
+    // Imagine drawing a horizontal ray from the test point out to the east
+    // (toward increasing longitude). Count how many polygon edges that ray crosses.
+    // - Odd number of crossings:  Point is inside.
+    // - Even number of crossings: Point is outside.
+    // The code doesn't actually draw a ray.
+    // It just checks each edge and flips a boolean (inside.toggle())
+    // every time the ray would cross that edge.
+    // Note: this checks vertices only,
+    // which is a good approximation for the roughly-convex octagons this app draws,
+    // but isn't a mathematically exact polygon-in-polygon test
+    // for arbitrary self-intersecting shapes.
+    // Full correctness would require a proper polygon-clipping library
+    // rather than a hand-rolled check.
+    private func coordinateInPolygon(_ coordinate: CLLocationCoordinate2D, polygon: [CLLocationCoordinate2D]) -> Bool {
+        var inside = false
+        var j = polygon.count - 1
+        for i in 0..<polygon.count {
+            let xi = polygon[i].longitude, yi = polygon[i].latitude
+            let xj = polygon[j].longitude, yj = polygon[j].latitude
+            if ((yi > coordinate.latitude) != (yj > coordinate.latitude)) &&
+                (coordinate.longitude < (xj - xi) * (coordinate.latitude - yi) / (yj - yi) + xi) {
+                inside.toggle()
+            }
+            j = i
+        }
+        return inside
+    }
+
+
+    private func polygonFullyContains(outer: [CLLocationCoordinate2D], inner: [CLLocationCoordinate2D]) -> Bool {
+        for coordinate in inner {
+            if !coordinateInPolygon(coordinate, polygon: outer) {
+                return false
+            }
+        }
+        return true
+    }
+
+
+
 }
 
 
