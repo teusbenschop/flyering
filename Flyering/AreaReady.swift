@@ -138,23 +138,32 @@ final class MarkAreaReady: ObservableObject {
         
         // Store the coordinates in the database.
         let areaDatabase = AreaDatabase()
-        let rowid = areaDatabase.storeCoordinates(coordinates: coordinates)
+        let newId = areaDatabase.storeCoordinates(coordinates: coordinates)
 
         // On failure to store the coordinates, bail out early.
         // It means that the map retains the area as if still working on marking it.
-        if rowid == nil {
-            //status.log(item: "Failure to store the marked area")
+        if newId == nil {
             return
         }
         
         // Keep a copy of the coordinates.
-        let coordinates = self.coordinates
+        let newCoordinates = self.coordinates
 
         // Remove the markers from the map.
         clear(mapView: mapView)
         
         // Call function with data from the database to draw this polygon.
-        drawPolygon(mapView: mapView, id: rowid!, coordinates: coordinates) // Todo write ID.
+        drawPolygon(mapView: mapView, id: newId!, coordinates: newCoordinates)
+
+        // Remove any existing areas that the new area fully covers.
+        for overlay in mapView.overlays {
+            guard let existing = overlay as? StoredAreaPolygon, existing.rowid != newId else { continue }
+            if polygonFullyContains(outer: newCoordinates, inner: existing.storedCoordinates) {
+                areaDatabase.removeArea(id: existing.rowid)
+                mapView.removeOverlay(existing)
+                print ("Remove polygon", existing.rowid)
+            }
+        }
     }
 
     
